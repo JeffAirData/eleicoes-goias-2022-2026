@@ -1,0 +1,47 @@
+# Ambiente virtual
+.venv/
+venv/
+
+# Dados brutos e fontes locais pesadas
+Data/raw/
+Data/2022/
+Data/2026/
+Data/interim/
+data/raw/
+data/2022/
+data/2026/
+data/interim/
+
+# Arquivos pesados em geral
+*.csv
+*.parquet
+*.zip
+
+# Permitir apenas artefatos públicos processados e visuais
+!Data/processed/**/*.html
+!Data/processed/**/*.png
+!Data/processed/**/*.json
+!Data/processed/**/*.parquet
+!data/processed/**/*.html
+!data/processed/**/*.png
+!data/processed/**/*.json
+!data/processed/**/*.parquet
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# GitHub extras
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
