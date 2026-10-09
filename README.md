@@ -1,79 +1,94 @@
-# Perfil do eleitorado de Goiás e contexto eleitoral municipal
+# Perfil do eleitorado de Goiás: contexto territorial e demográfico
 
-Este projeto reúne uma análise exploratória do perfil do eleitorado em Goiás, com foco na estrutura municipal do eleitorado, composição por sexo, faixa etária e concentração territorial. A base validada neste repositório é o perfil do eleitorado por seção, agregada em nível municipal.
+Este repositório reúne uma análise pública do perfil do eleitorado em Goiás, com foco em contexto territorial, distribuição municipal e composição demográfica. O objetivo é produzir uma leitura técnica e transparente do eleitorado do estado, com rigor metodológico e limites explícitos sobre o que os dados disponíveis permitem afirmar.
 
 ## Objetivo
 
 - mapear a distribuição territorial do eleitorado em Goiás
 - descrever padrões demográficos municipais
-- comparar municípios por composição de sexo e faixa etária
+- comparar municípios por composição por sexo
+- contextualizar o eleitorado em relação à estrutura territorial do estado
 - gerar uma narrativa visual clara para GitHub e LinkedIn
 - manter a análise rigorosa e transparente sobre as limitações dos dados
 
-## O que a análise inclui
+## Escopo do projeto
 
-A base disponível neste workspace permite:
+Este trabalho foi desenvolvido com base em dados públicos de perfil do eleitorado em nível municipal, agregados para permitir análise territorial e demográfica. O foco está no contexto do eleitorado e não na apuração oficial de votos por candidato.
 
-- localizar a distribuição do eleitorado por município
-- comparar proporções de mulheres e homens por município
-- observar a participação de faixas etárias jovens
-- gerar mapas e painéis temáticos geoespaciais e municipais
-- produzir uma leitura do contexto eleitoral no estado sem extrapolar conclusões individuais
+A análise é útil para:
 
-## O que a análise não inclui
+- entender a estrutura do eleitorado em diferentes municípios
+- comparar padrões demográficos e territoriais
+- gerar visualizações públicas e didáticas
+- apoiar discussões técnicas sobre perfil eleitoral e contexto estadual
 
-A base local validada aqui não substitui a tabela oficial do TSE/TRE com resultado por candidato para presidente em nível municipal. Portanto, o projeto não afirma preferência individual de eleitores nem conclui voto por candidato a partir do perfil do município.
+## Limites metodológicos
 
-A narrativa final do projeto deve manter claramente esta ressalva:
+Este projeto não substitui a apuração oficial do TSE/TRE e não pretende afirmar comportamento eleitoral individual ou votos por candidato sem a base oficial correspondente.
 
-- esta é uma análise de contexto eleitoral e perfil do eleitorado
-- não é uma análise oficial de votos por candidato
-- qualquer inferência de voto individual exige a base oficial de resultados do TSE/TRE
+A interpretação deve seguir esta regra:
 
-## Público-alvo
+- o material é uma análise de contexto eleitoral e demográfico
+- não é um resultado oficial de eleições
+- não inferimos voto individual a partir de dados agregados por município
+- qualquer comparação com resultados oficiais deve ser feita com a base do TSE/TRE
 
-- profissionais de ciência de dados
-- analistas políticos e eleitorais
-- público técnico em dados públicos
-- comunidade de visualização e storytelling com dados
+> Legenda metodológica: esta análise explora o perfil do eleitorado em Goiás em nível municipal e territorial. A base utilizada foi o eleitorado agregado por municípios e não uma tabela oficial de votos por candidato. Portanto, o material deve ser lido como contexto eleitoral e demografia do eleitorado, e não como inferência individual de voto.
 
-## Organização do repositório
+## O que está incluído
+
+- base municipal de perfil do eleitorado
+- agregação territorial por município
+- indicadores de composição por sexo
+- leitura demográfica e territorial do eleitorado
+- dashboard visual interativo
+- materiais de apoio para publicação em GitHub e LinkedIn
+
+## O que não está incluído
+
+- resultados oficiais de votação por candidato
+- análise de preferências eleitorais por partido ou candidato
+- inferência de voto individual
+- substituição da base oficial do TSE/TRE
+
+## Metodologia
+
+A análise foi construída a partir de dados públicos e processados em ambiente local, seguindo uma abordagem de:
+
+- limpeza e organização dos dados
+- agregação por município
+- validação de unidades territoriais
+- contextualização demográfica e territorial
+- geração de visualizações e dashboard
+
+A transparência metodológica é parte central do projeto. O objetivo é reduzir ambiguidades e evitar extrapolações que não tenham suporte na base disponível.
+
+## Estrutura do repositório
 
 ```text
 .
 ├── Data/
-│   ├── 2022/                 # dados locais do ano de 2022
-│   ├── 2026/                 # dados locais do ano de 2026
-│   ├── processed/            # bases prontas para análise e dashboard
-│   └── raw/                  # cópias originais mantidas em local seguro
+│   ├── processed/
+│   └── raw/
 ├── notebooks/
 │   ├── 01_go_presidente_2022_2026.ipynb
 │   ├── 02_goias_geospatial_analysis.ipynb
 │   └── 03_presidente_goias_2022_2026.ipynb
 ├── src/
+├── publicacao/
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
 └── .venv/
 ```
 
-## Dados e metodologia
+## Reprodutibilidade
 
-### Fonte local validada
+Para reproduzir a análise, basta instalar as dependências e executar os notebooks em ordem:
 
-A base realmente confiável e disponível neste workspace para a análise exploratória é a base de perfil do eleitorado por seção de Goiás, já processada em formato Parquet.
-
-### Limitação metodológica
-
-A análise por município pode revelar padrões territoriais e demográficos, mas não permite inferir o voto individual de cada eleitor. Isso é a falácia ecológica.
-
-Em linguagem simples:
-
-- um município com maior proporção feminina não significa que cada mulher votou em certo candidato
-- um município com maior proporção de eleitores jovens não implica comportamento individual uniforme
-- correlações municipais são úteis para descrever contextos, não para afirmar comportamento individual
-
-## Como reproduzir
+1. preparação e agregação dos dados
+2. análise geoespacial
+3. dashboard final
 
 ```bash
 python -m venv .venv
@@ -83,29 +98,20 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-Em seguida, execute os notebooks em ordem:
-
-1. 01_go_presidente_2022_2026.ipynb
-2. 02_goias_geospatial_analysis.ipynb
-3. 03_presidente_goias_2022_2026.ipynb
-
 ## Saídas principais
 
-- dashboard municipal em HTML
-- mapa geoespacial do perfil do eleitorado
-- gráficos de composição por sexo e juventude
-- base municipal agregada em Parquet
+- dashboard interativo em HTML
+- visualizações de contexto territorial
+- gráficos de composição demográfica
+- materiais de divulgação para GitHub e LinkedIn
 
-## Legenda metodológica para publicação
+## Conclusão
 
-> Este projeto analisa o perfil do eleitorado de Goiás em nível municipal e territorial. A base utilizada foi o eleitorado por seção, agregada municipalmente, e não uma tabela oficial de votos por candidato para presidente. Portanto, o material deve ser lido como análise exploratória de contexto eleitoral e estrutura demográfica, e não como inferência individual de voto. A comparação com resultados eleitorais oficiais exige a base do TSE/TRE.
+Este projeto oferece uma visão pública, técnica e responsável sobre o perfil do eleitorado em Goiás, destacando sua estrutura territorial e demográfica. A intenção é produzir uma leitura útil para comunicação, visualização e pesquisa, mantendo um padrão rigoroso de transparência metodológica e limites analíticos.
 
-## Próximos passos
+## Observação final
 
-1. incorporar a base oficial de votação por município/candidato do TSE/TRE
-2. comparar a distribuição demográfica com os resultados oficiais
-3. expandir o painel para visualizações interativas de maior impacto
-4. preparar comunicado para GitHub e LinkedIn com foco no contexto e na metodologia
+A análise aqui apresentada deve ser interpretada como contexto eleitoral e demográfico, e não como resultado oficial de apuração. O objetivo central do projeto é a compreensão do eleitorado em seu cenário territorial e institucional, sempre com método explícito e cautela analítica.
 
 ## Licença
 
