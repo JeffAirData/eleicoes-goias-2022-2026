@@ -242,12 +242,19 @@ def build_painel(mun: pd.DataFrame, geo) -> None:
         fig = px.choropleth(dados, geojson=geojson, locations="cd_municipio", featureidkey="properties.cd_municipio",
                             color=coluna, color_continuous_scale=escala, hover_name="name_muni",
                             hover_data={"cd_municipio": False, coluna: ":.1f"}, labels={coluna: rotulo}, **kwargs)
-        fig.update_geos(fitbounds="locations", visible=False, bgcolor=SURFACE)
+        # limites fixos de Goiás: o fitbounds deixa o mapa pequeno dentro do quadro
+        fig.update_geos(visible=False, bgcolor=SURFACE, projection_type="mercator",
+                        lonaxis_range=[-53.4, -45.8], lataxis_range=[-19.7, -12.2],
+                        domain={"x": [0, 1], "y": [0.14, 1]})
         fig.update_traces(marker_line_color="white", marker_line_width=0.4)
-        fig.update_layout(margin={"r": 0, "l": 0, "t": 0, "b": 0}, height=560, paper_bgcolor=SURFACE,
-                          font_family="Segoe UI, system-ui, sans-serif", coloraxis_colorbar_title_side="right")
+        # barra de cores horizontal embaixo: sobra largura para o mapa no celular
+        fig.update_layout(margin={"r": 0, "l": 0, "t": 0, "b": 0}, autosize=True, paper_bgcolor=SURFACE,
+                          font_family="Segoe UI, system-ui, sans-serif",
+                          coloraxis_colorbar={"orientation": "h", "y": 0, "yanchor": "bottom", "len": 0.7,
+                                              "thickness": 12, "title": {"side": "top"}})
         return fig.to_html(full_html=False, include_plotlyjs="cdn" if div_id == "mapa-pt" else False,
-                           div_id=div_id, config={"displayModeBar": False})
+                           div_id=div_id, default_width="100%", default_height="100%",
+                           config={"displayModeBar": False, "responsive": True, "scrollZoom": False})
 
     cidades = [
         {"cd": int(r.cd_municipio), "nome": r.name_muni, "aptos": int(r.aptos_2026),

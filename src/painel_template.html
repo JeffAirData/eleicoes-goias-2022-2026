@@ -33,6 +33,17 @@
   ul { margin: 18px 0 0; padding-left: 20px; color: var(--ink); line-height: 1.6; }
   .mapa { padding: 16px 8px 8px; }
   .mapa h3, .mapa p { padding: 0 12px; }
+  .mapa-box { height: clamp(340px, 95vw, 600px); }
+  @media (max-width: 600px) {
+    main { padding: 16px 12px 40px; }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.3rem; }
+    .lead { font-size: 1.05rem; }
+    section { padding: 16px 14px; margin: 14px 0; }
+    .mapa { padding: 14px 4px 4px; }
+    .linha { grid-template-columns: 40px 1fr 34px; gap: 6px; }
+    ul { padding-left: 18px; }
+  }
   footer { color: var(--muted); font-size: 0.9rem; margin-top: 24px; }
   a { color: var(--pl); }
 </style>
@@ -53,17 +64,17 @@
 <section class="mapa">
   <h3>Onde Lula mais perdeu votos</h3>
   <p>Quanto mais escuro, maior a queda entre 2022 e 2026. Clique numa cidade para ver os números dela.</p>
-  __MAPA_PT__
+  <div class="mapa-box">__MAPA_PT__</div>
 </section>
 <section class="mapa">
   <h3>Onde o PL cresceu e onde caiu</h3>
   <p>Azul: o PL teve mais votos que em 2022. Vermelho: teve menos.</p>
-  __MAPA_PL__
+  <div class="mapa-box">__MAPA_PL__</div>
 </section>
 <section class="mapa">
   <h3>Onde Ronaldo Caiado foi mais forte</h3>
   <p>Quanto mais escuro, maior a parcela dos votos para o ex-governador em 2026.</p>
-  __MAPA_CAIADO__
+  <div class="mapa-box">__MAPA_CAIADO__</div>
 </section>
 
 <footer>
