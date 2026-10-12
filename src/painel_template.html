@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Presidente em Goiás: 2022 x 2026</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --line: #e1e0d9; --pl: #2a78d6; --pt: #e34948; --caiado: #eda100;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--page); color: var(--ink); margin: 0; }
+  main { max-width: 920px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.9rem; margin: 0 0 8px; line-height: 1.2; }
+  h2 { font-size: 1.5rem; margin: 0; }
+  h3 { font-size: 1.15rem; margin: 0 0 4px; }
+  p { color: var(--ink-2); line-height: 1.5; margin: 6px 0; }
+  .lead { font-size: 1.15rem; color: var(--ink); }
+  section { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin: 20px 0; padding: 20px; }
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  input { width: 100%; font: inherit; font-size: 1.1rem; padding: 12px 14px; border: 2px solid var(--pl); border-radius: 8px; background: #fff; color: var(--ink); }
+  .sub { color: var(--muted); margin: 2px 0 18px; }
+  .cand { margin: 16px 0; }
+  .cand-nome { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .linha { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 8px; margin-top: 6px; color: var(--ink-2); }
+  .trilho { background: #efeee9; border-radius: 4px; height: 18px; overflow: hidden; }
+  .barra { height: 100%; border-radius: 0 4px 4px 0; }
+  .antes .barra { opacity: 0.45; }
+  .valor { font-weight: 700; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+  ul { margin: 18px 0 0; padding-left: 20px; color: var(--ink); line-height: 1.6; }
+  .mapa { padding: 16px 8px 8px; }
+  .mapa h3, .mapa p { padding: 0 12px; }
+  footer { color: var(--muted); font-size: 0.9rem; margin-top: 24px; }
+  a { color: var(--pl); }
+</style>
+</head>
+<body>
+<main>
+<h1>Como Goiás votou para presidente: 2022 x 2026</h1>
+<p class="lead" id="manchete"></p>
+
+<section>
+  <label for="busca">Veja o resultado na sua cidade</label>
+  <input id="busca" list="cidades" autocomplete="off" placeholder="Digite o nome da cidade">
+  <datalist id="cidades"></datalist>
+</section>
+
+<section id="cartao" aria-live="polite"></section>
+
+<section class="mapa">
+  <h3>Onde Lula mais perdeu votos</h3>
+  <p>Quanto mais escuro, maior a queda entre 2022 e 2026. Clique numa cidade para ver os números dela.</p>
+  __MAPA_PT__
+</section>
+<section class="mapa">
+  <h3>Onde o PL cresceu e onde caiu</h3>
+  <p>Azul: o PL teve mais votos que em 2022. Vermelho: teve menos.</p>
+  __MAPA_PL__
+</section>
+<section class="mapa">
+  <h3>Onde Ronaldo Caiado foi mais forte</h3>
+  <p>Quanto mais escuro, maior a parcela dos votos para o ex-governador em 2026.</p>
+  __MAPA_CAIADO__
+</section>
+
+<footer>
+  <p>Os números são do 1º turno e contam só os votos dados a algum candidato (sem brancos e nulos).
+  Eles mostram onde o voto mudou, não quem mudou de voto.</p>
+  <p>Fonte: TSE, Portal de Dados Abertos. Mapa dos municípios: IBGE 2020.
+  <a href="https://github.com/JeffAirData/eleicoes-goias-2022-2026">Código e dados no GitHub</a>.</p>
+</footer>
+</main>
+
+<script>
+const DADOS = __DADOS__;
+const ESTADO = __ESTADO__;
+const CIDADE_INICIAL = "Goiânia";
+
+const semAcento = (t) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+const porNome = new Map(DADOS.map((d) => [semAcento(d.nome), d]));
+const porCodigo = new Map(DADOS.map((d) => [String(d.cd), d]));
+const n0 = (v) => Math.round(v).toLocaleString("pt-BR");
+const n1 = (v) => Math.abs(v).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const pontos = (v) => `${n1(v)} ${Math.abs(v) < 1.95 ? "ponto" : "pontos"}`;
+
+function candidato(nome, cor, antes, depois) {
+  const linha = (ano, valor, classe) => valor === null
+    ? `<div class="linha ${classe}"><span>${ano}</span><span>não concorreu</span><span></span></div>`
+    : `<div class="linha ${classe}"><span>${ano}</span>
+         <div class="trilho"><div class="barra" style="width:${valor}%;background:${cor}"></div></div>
+         <span class="valor">${n0(valor)}</span></div>`;
+  return `<div class="cand"><div class="cand-nome"><span class="dot" style="background:${cor}"></span>${nome}</div>
+          ${linha(2022, antes, "antes")}${linha(2026, depois, "depois")}</div>`;
+}
+
+function frente(d) {
+  const nome = { PL: "o PL", PT: "o PT" };
+  if (d.venc22 === d.venc26) return `${nome[d.venc22]} ficou na frente em 2022 e em 2026`;
+  return `a cidade trocou ${nome[d.venc22]} pel${nome[d.venc26]}`;
+}
+
+function mostrar(d) {
+  const varPt = d.pt26 - d.pt22, varPl = d.pl26 - d.pl22;
+  const css = getComputedStyle(document.documentElement);
+  const cor = (v) => css.getPropertyValue(v).trim();
+  document.getElementById("cartao").innerHTML = `
+    <h2>${d.nome}</h2>
+    <p class="sub">${d.aptos.toLocaleString("pt-BR")} eleitores · ${frente(d)}</p>
+    <p><strong>De cada 100 votos para presidente em ${d.nome}:</strong></p>
+    ${candidato("PL (Jair Bolsonaro em 2022, Flávio Bolsonaro em 2026)", cor("--pl"), d.pl22, d.pl26)}
+    ${candidato("Lula (PT)", cor("--pt"), d.pt22, d.pt26)}
+    ${candidato("Ronaldo Caiado (PSD)", cor("--caiado"), null, d.caiado)}
+    <ul>
+      <li>Lula caiu ${pontos(varPt)} aqui. No estado, a queda foi de ${pontos(ESTADO.var_pt)}.</li>
+      <li>O PL ${varPl >= 0 ? "subiu" : "caiu"} ${pontos(varPl)}. No estado, subiu ${pontos(ESTADO.var_pl)}.</li>
+      <li>De cada 100 eleitores, ${n0(d.abst26)} não foram votar. Em 2022, foram ${n0(d.abst22)}.</li>
+    </ul>`;
+}
+
+const busca = document.getElementById("busca");
+document.getElementById("cidades").innerHTML = DADOS.map((d) => `<option value="${d.nome}">`).join("");
+function procurar() {
+  const d = porNome.get(semAcento(busca.value));
+  if (d) mostrar(d);
+}
+busca.addEventListener("input", procurar);
+busca.addEventListener("change", procurar);
+busca.addEventListener("focus", () => busca.select());
+
+document.getElementById("manchete").textContent =
+  `Em 2022, ${Math.round(ESTADO.pt22 / 10)} de cada 10 votos em Goiás foram para Lula. Em 2026, foram ` +
+  `${Math.round(ESTADO.pt26 / 10)}. O PL ficou com ${Math.round(ESTADO.pl26 / 10)} de cada 10 nas duas eleições.`;
+
+busca.value = CIDADE_INICIAL;
+procurar();
+
+for (const id of ["mapa-pt", "mapa-pl", "mapa-caiado"]) {
+  const div = document.getElementById(id);
+  if (div && div.on) {
+    div.on("plotly_click", (ev) => {
+      const d = porCodigo.get(String(ev.points[0].location));
+      if (!d) return;
+      busca.value = d.nome;
+      mostrar(d);
+      document.getElementById("cartao").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+}
+</script>
+</body>
+</html>

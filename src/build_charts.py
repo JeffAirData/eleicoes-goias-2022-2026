@@ -193,60 +193,84 @@ def chart_idade() -> None:
     plt.close(fig)
 
 
-def build_painel(geo) -> None:
+def chart_cartoes(mun: pd.DataFrame) -> None:
+    perfil = pd.read_parquet(DATA_DIR / "eleitorado_go_perfil.parquet")
+    idosos = {ano: (df["pct_60_mais"] * df["eleitores"]).sum() / df["eleitores"].sum()
+              for ano, df in perfil.groupby("ano")}
+    pt_frente = {ano: int((mun[f"vencedor_{ano}"] == "PT").sum()) for ano in (2022, 2026)}
+    viraram = int(((mun["vencedor_2022"] == "PT") & (mun["vencedor_2026"] == "PL")).sum())
+    voltaram = int(((mun["vencedor_2022"] == "PL") & (mun["vencedor_2026"] == "PT")).sum())
+    cairam = int((mun["var_pt"] < 0).sum())
+    caiado = estado(2026)[55]
+
+    cartoes = [
+        (PT, f"{pt_frente[2022]} → {pt_frente[2026]}",
+         "cidades de Goiás onde Lula foi\no mais votado para presidente,\nem 2022 e em 2026"),
+        (PT, f"{cairam} de {len(mun)}",
+         "Lula teve uma parcela menor\ndos votos em todas as\ncidades goianas" if cairam == len(mun)
+         else "cidades goianas onde Lula teve\numa parcela menor dos votos"),
+        (PL, f"{viraram} a {voltaram}",
+         f"{viraram} cidades trocaram o PT pelo PL.\n"
+         + ("Nenhuma fez o caminho contrário." if voltaram == 0 else f"{voltaram} fizeram o caminho contrário.")),
+        (CAIADO, f"1 em cada {round(100 / caiado)}",
+         "votos para presidente em Goiás\nfoi para Ronaldo Caiado,\nex-governador do estado"),
+        ("#256abf", f"1 em cada {round(100 / idosos[2026])}",
+         f"eleitores goianos tem 60 anos ou mais.\nEm 2022, eram {round(idosos[2022])} em cada 100.\n"
+         f"Hoje são {round(idosos[2026])}."),
+    ]
+    for i, (cor, numero, frase) in enumerate(cartoes, start=1):
+        fig = plt.figure(figsize=(10.8, 10.8))
+        fig.add_artist(plt.Rectangle((0.08, 0.86), 0.12, 0.012, color=cor, transform=fig.transFigure))
+        fig.text(0.08, 0.80, "PRESIDENTE EM GOIÁS · 2022 x 2026", fontsize=20, color=INK_2, fontweight="bold")
+        fig.text(0.08, 0.50, numero, fontsize=118, fontweight="bold", color=INK, va="center")
+        fig.text(0.08, 0.33, frase, fontsize=31, color=INK_2, va="top", linespacing=1.35)
+        fig.text(0.08, 0.06, f"{i}/{len(cartoes)} · Fonte: TSE, 1º turno · github.com/JeffAirData",
+                 fontsize=16, color=MUTED)
+        fig.savefig(IMG_DIR / f"cartao_{i}.png", dpi=100)
+        plt.close(fig)
+
+
+def build_painel(mun: pd.DataFrame, geo) -> None:
     simples = geo.copy()
     simples["geometry"] = simples.geometry.simplify(0.01)
     simples["cd_municipio"] = simples["cd_municipio"].astype(int).astype(str)
     geojson = json.loads(simples[["cd_municipio", "geometry"]].to_json())
-    hover = {"cd_municipio": False, "pt_2022": ":.1f", "pt_2026": ":.1f", "pl_2022": ":.1f", "pl_2026": ":.1f",
-             "caiado_2026": ":.1f", "abstencao_2026": ":.1f", "aptos_2026": ":,"}
-    labels = {"pt_2022": "Lula 2022 (%)", "pt_2026": "Lula 2026 (%)", "pl_2022": "Jair Bolsonaro 2022 (%)",
-              "pl_2026": "Flávio Bolsonaro 2026 (%)", "caiado_2026": "Caiado 2026 (%)",
-              "abstencao_2026": "Abstenção 2026 (%)", "aptos_2026": "Eleitores aptos 2026",
-              "var_pt": "Variação de Lula (p.p.)", "var_pl": "Variação do PL (p.p.)"}
     dados = pd.DataFrame(simples.drop(columns="geometry"))
+    dados["perda_pt"] = -dados["var_pt"]
 
-    def mapa(coluna: str, escala: str | list, titulo: str, **kwargs):
+    def mapa(div_id: str, coluna: str, escala: list[str], rotulo: str, **kwargs) -> str:
         fig = px.choropleth(dados, geojson=geojson, locations="cd_municipio", featureidkey="properties.cd_municipio",
                             color=coluna, color_continuous_scale=escala, hover_name="name_muni",
-                            hover_data=hover, labels=labels, title=titulo, **kwargs)
-        fig.update_geos(fitbounds="locations", visible=False)
+                            hover_data={"cd_municipio": False, coluna: ":.1f"}, labels={coluna: rotulo}, **kwargs)
+        fig.update_geos(fitbounds="locations", visible=False, bgcolor=SURFACE)
         fig.update_traces(marker_line_color="white", marker_line_width=0.4)
-        fig.update_layout(margin={"r": 0, "l": 0, "t": 50, "b": 0}, height=620, paper_bgcolor=SURFACE,
-                          font_family="Segoe UI, system-ui, sans-serif")
-        return fig
+        fig.update_layout(margin={"r": 0, "l": 0, "t": 0, "b": 0}, height=560, paper_bgcolor=SURFACE,
+                          font_family="Segoe UI, system-ui, sans-serif", coloraxis_colorbar_title_side="right")
+        return fig.to_html(full_html=False, include_plotlyjs="cdn" if div_id == "mapa-pt" else False,
+                           div_id=div_id, config={"displayModeBar": False})
 
-    figs = [
-        mapa("var_pt", ["#a82c2c", "#e66767", "#f6d5d5"],
-             "Variação do voto em Lula entre 2022 e 2026 (pontos percentuais)"),
-        mapa("var_pl", ["#e34948", "#f0efec", "#2a78d6"],
-             "Variação do voto no PL entre 2022 e 2026 (pontos percentuais)", color_continuous_midpoint=0),
-        mapa("caiado_2026", ["#fbeecb", "#eda100", "#8a5d00"], "Voto em Ronaldo Caiado em 2026 (% dos válidos)"),
+    cidades = [
+        {"cd": int(r.cd_municipio), "nome": r.name_muni, "aptos": int(r.aptos_2026),
+         "pt22": round(r.pt_2022, 1), "pt26": round(r.pt_2026, 1), "pl22": round(r.pl_2022, 1),
+         "pl26": round(r.pl_2026, 1), "caiado": round(r.caiado_2026, 1), "abst22": round(r.abstencao_2022, 1),
+         "abst26": round(r.abstencao_2026, 1), "venc22": r.vencedor_2022, "venc26": r.vencedor_2026}
+        for r in dados.sort_values("name_muni").itertuples()
     ]
-    blocos = [f.to_html(full_html=False, include_plotlyjs="cdn" if i == 0 else False) for i, f in enumerate(figs)]
-    html = f"""<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Presidente em Goiás: 2022 x 2026</title>
-<style>
-  body {{ font-family: "Segoe UI", system-ui, sans-serif; background: #f9f9f7; color: {INK}; margin: 0; }}
-  main {{ max-width: 1000px; margin: 0 auto; padding: 24px 16px; }}
-  p {{ color: {INK_2}; }}
-  section {{ background: {SURFACE}; border: 1px solid {GRID}; border-radius: 8px; margin: 16px 0; padding: 8px; }}
-</style>
-</head>
-<body>
-<main>
-<h1>Presidente em Goiás: 2022 x 2026</h1>
-<p>1º turno, votos válidos por município. Passe o mouse sobre um município para ver os números.</p>
-{''.join(f'<section>{b}</section>' for b in blocos)}
-<p>{FONTE} Malha municipal: IBGE 2020.</p>
-</main>
-</body>
-</html>
-"""
+    e22, e26 = estado(2022), estado(2026)
+    resumo = {"pt22": round(e22[13], 1), "pt26": round(e26[13], 1), "pl22": round(e22[22], 1), "pl26": round(e26[22], 1),
+              "var_pt": round(e26[13] - e22[13], 1), "var_pl": round(e26[22] - e22[22], 1)}
+
+    html = (Path(__file__).parent / "painel_template.html").read_text(encoding="utf-8")
+    partes = {
+        "__DADOS__": json.dumps(cidades, ensure_ascii=False),
+        "__ESTADO__": json.dumps(resumo),
+        "__MAPA_PT__": mapa("mapa-pt", "perda_pt", ["#f6d5d5", "#e66767", "#a82c2c"], "Pontos perdidos"),
+        "__MAPA_PL__": mapa("mapa-pl", "var_pl", ["#e34948", "#f0efec", "#2a78d6"], "Pontos a mais ou a menos",
+                            color_continuous_midpoint=0),
+        "__MAPA_CAIADO__": mapa("mapa-caiado", "caiado_2026", ["#fbeecb", "#eda100", "#8a5d00"], "De cada 100 votos"),
+    }
+    for marcador, valor in partes.items():
+        html = html.replace(marcador, valor)
     (DOCS_DIR / "index.html").write_text(html, encoding="utf-8")
 
 
@@ -259,7 +283,8 @@ def main() -> None:
     chart_mapas(geo)
     chart_dispersao(mun)
     chart_idade()
-    build_painel(geo)
+    chart_cartoes(mun)
+    build_painel(mun, geo)
     print(f"Gráficos em {IMG_DIR} e painel em {DOCS_DIR / 'index.html'}")
 
 

@@ -1,35 +1,60 @@
-# Presidente em Goiás: 2022 x 2026
+# Como Goiás votou para presidente: 2022 x 2026
 
-Comparação do 1º turno para presidente nos 246 municípios de Goiás, com dados abertos do TSE.
+**Em 2022, 4 de cada 10 votos para presidente em Goiás foram para Lula. Em 2026, foram 3.**
 
-**Painel interativo:** https://jeffairdata.github.io/eleicoes-goias-2022-2026/
+Lula era o mais votado em 97 das 246 cidades goianas. Agora é em 28. Nenhuma cidade fez o caminho contrário.
 
-## O que os dados mostram
+👉 **[Veja o resultado na sua cidade](https://jeffairdata.github.io/eleicoes-goias-2022-2026/)**
 
-| | 2022 | 2026 |
-|---|---|---|
-| PL (Jair Bolsonaro / Flávio Bolsonaro) | 52,2% | 53,6% |
-| PT (Lula) | 39,5% | 31,1% |
-| Ronaldo Caiado (PSD) | – | 12,3% |
-| Municípios com PL à frente | 149 | 218 |
-| Municípios com PT à frente | 97 | 28 |
-| Abstenção | 21,7% | 21,8% |
-| Eleitores aptos | 4.870.292 | 5.080.590 |
-| Eleitores com 60 anos ou mais | 18,5% | 21,7% |
-| Eleitores de 16 a 29 anos | 24,8% | 22,0% |
+![Candidato mais votado em cada cidade](docs/img/02_mapa_vencedor.png)
 
-- Lula recuou em todos os 246 municípios, entre 4,6 e 24,5 pontos percentuais.
-- 69 municípios passaram do PT para o PL; nenhum fez o caminho inverso.
-- O PL cresceu em 201 municípios e caiu em 45, entre eles Goiânia (56,1% para 54,7%).
-- Caiado teve de 3,5% a 32,3% dos válidos conforme o município.
-- A abstenção ficou estável e o eleitorado envelheceu.
+## Em cinco números
 
-![Resultado estadual](docs/img/01_resultado_estadual.png)
-![Candidato mais votado por município](docs/img/02_mapa_vencedor.png)
-![Lula em 2022 e 2026 por município](docs/img/03_lula_2022_x_2026.png)
-![Eleitorado por faixa etária](docs/img/04_eleitorado_idade.png)
+| | |
+|---|---|
+| ![](docs/img/cartao_1.png) | ![](docs/img/cartao_2.png) |
+| ![](docs/img/cartao_3.png) | ![](docs/img/cartao_4.png) |
+| ![](docs/img/cartao_5.png) | |
 
-## Dados
+## O que mudou
+
+- **Lula perdeu espaço em todo o estado.** Teve uma parcela menor dos votos em todas as 246 cidades.
+- **O PL ficou onde estava.** Jair Bolsonaro teve 52 de cada 100 votos em 2022; Flávio Bolsonaro, 54 em 2026.
+- **Caiado entrou na disputa.** O ex-governador ficou com 12 de cada 100 votos, e chegou a 32 em Guarani de Goiás.
+- **A abstenção não mudou.** Nas duas eleições, 22 de cada 100 eleitores não foram votar.
+- **O eleitor ficou mais velho.** Quem tem 60 anos ou mais passou de 18 para 22 em cada 100 eleitores.
+
+![Resultado no estado](docs/img/01_resultado_estadual.png)
+
+## As 10 maiores cidades
+
+De cada 100 votos para presidente, quantos foram para cada um:
+
+| Cidade | PL 2022 | PL 2026 | Lula 2022 | Lula 2026 | Caiado 2026 |
+|---|---|---|---|---|---|
+| Goiânia | 56,1 | 54,7 | 33,1 | 28,2 | 13,5 |
+| Aparecida de Goiânia | 50,7 | 50,5 | 39,8 | 31,6 | 14,4 |
+| Anápolis | 63,0 | 63,1 | 27,9 | 21,8 | 11,5 |
+| Rio Verde | 55,6 | 63,7 | 37,7 | 26,8 | 5,3 |
+| Luziânia | 53,9 | 51,4 | 38,1 | 31,2 | 14,9 |
+| Águas Lindas de Goiás | 46,5 | 46,6 | 45,5 | 39,1 | 10,8 |
+| Valparaíso de Goiás | 50,1 | 48,8 | 41,3 | 36,3 | 11,1 |
+| Trindade | 49,8 | 49,2 | 41,1 | 31,3 | 16,7 |
+| Senador Canedo | 48,6 | 48,4 | 42,8 | 34,1 | 14,2 |
+| Formosa | 51,1 | 52,2 | 41,0 | 31,9 | 13,1 |
+
+![Lula em 2022 e 2026, cidade por cidade](docs/img/03_lula_2022_x_2026.png)
+![Eleitorado por idade](docs/img/04_eleitorado_idade.png)
+
+## Como ler estes números
+
+- São do 1º turno e contam só os votos dados a algum candidato (sem brancos e nulos).
+- Mostram onde o voto mudou, não quem mudou de voto.
+- Os dados de 2026 são da extração do TSE de 11/10/2026 e podem ser atualizados.
+
+---
+
+## Para quem quer os dados
 
 Em `Data/processed/`, em Parquet e CSV:
 
@@ -40,9 +65,9 @@ Em `Data/processed/`, em Parquet e CSV:
 | `eleitorado_go_perfil` | eleitorado por município: sexo, faixa etária e escolaridade |
 | `resumo_municipios_go.csv` | uma linha por município com os indicadores dos gráficos |
 
-Fonte: [Portal de Dados Abertos do TSE](https://dadosabertos.tse.jus.br/), arquivos `votacao_candidato_munzona`, `detalhe_votacao_munzona` e `perfil_eleitor_secao`. Os dados de 2026 são da extração de 11/10/2026 e podem ser atualizados pelo TSE. Malha municipal: IBGE 2020, via `geobr`.
+Fonte: [Portal de Dados Abertos do TSE](https://dadosabertos.tse.jus.br/), arquivos `votacao_candidato_munzona`, `detalhe_votacao_munzona` e `perfil_eleitor_secao`. Malha municipal: IBGE 2020, via `geobr`.
 
-## Como reproduzir
+### Como reproduzir
 
 ```bash
 python -m venv .venv
@@ -52,7 +77,3 @@ python src/download_tse.py      # cerca de 1,1 GB
 python src/build_dataset.py
 python src/build_charts.py
 ```
-
-## Limite da análise
-
-Os dados são agregados por município: mostram onde o voto mudou, não quem mudou de voto.

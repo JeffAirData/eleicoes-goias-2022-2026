@@ -1,20 +1,23 @@
-Imagem do post: `docs/img/02_mapa_vencedor.png` (1200x630). Carrossel: as outras três imagens de `docs/img/`.
+Carrossel do post: `docs/img/cartao_1.png` a `cartao_5.png` (1080x1080), nessa ordem, e `docs/img/02_mapa_vencedor.png` por último.
 
 ---
 
-Em 2022, Lula foi o mais votado em 97 dos 246 municípios de Goiás. Em 2026, em 28.
+Em 2022, 4 de cada 10 votos para presidente em Goiás foram para Lula. Em 2026, foram 3.
 
-Cruzei os dados abertos do TSE do 1º turno para presidente nas duas eleições, município a município:
+Peguei os dados abertos do TSE do 1º turno das duas eleições e comparei as 246 cidades do estado:
 
-- Lula caiu de 39,5% para 31,1% dos votos válidos no estado e recuou em todos os 246 municípios.
-- O PL foi de 52,2% (Jair Bolsonaro) para 53,6% (Flávio Bolsonaro).
-- Ronaldo Caiado, ex-governador, teve 12,3%.
-- 69 municípios trocaram o PT pelo PL. Nenhum fez o caminho inverso.
-- A abstenção não mudou: 21,7% em 2022, 21,8% em 2026.
-- O eleitorado envelheceu: quem tem 60 anos ou mais passou de 18,5% para 21,7%.
+- Lula era o mais votado em 97 cidades. Agora é em 28.
+- 69 cidades trocaram o PT pelo PL. Nenhuma fez o caminho contrário.
+- O PL ficou onde estava: 52 de cada 100 votos com Jair Bolsonaro, 54 com Flávio Bolsonaro.
+- Ronaldo Caiado, ex-governador, ficou com 1 em cada 8 votos.
+- A abstenção não mudou: 22 de cada 100 eleitores não foram votar.
+- O eleitor ficou mais velho: 1 em cada 5 tem 60 anos ou mais.
 
-Os dados são agregados por município: mostram onde o voto mudou, não quem mudou de voto.
+Quer ver a sua cidade? É só digitar o nome:
+https://jeffairdata.github.io/eleicoes-goias-2022-2026/
 
-Código, bases prontas e mapa interativo: https://github.com/JeffAirData/eleicoes-goias-2022-2026
+Os números mostram onde o voto mudou, não quem mudou de voto.
+
+Código e dados: https://github.com/JeffAirData/eleicoes-goias-2022-2026
 
 #Eleições2026 #Goiás #DadosAbertos #TSE #DataScience
