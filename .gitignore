@@ -22,6 +22,7 @@ data/interim/
 !Data/processed/**/*.png
 !Data/processed/**/*.json
 !Data/processed/**/*.parquet
+!Data/processed/**/*.csv
 !data/processed/**/*.html
 !data/processed/**/*.png
 !data/processed/**/*.json
