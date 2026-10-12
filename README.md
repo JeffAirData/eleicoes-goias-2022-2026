@@ -6,7 +6,7 @@ Lula era o mais votado em 97 das 246 cidades goianas. Agora é em 28. Nenhuma ci
 
 👉 **[Veja o resultado na sua cidade](https://jeffairdata.github.io/eleicoes-goias-2022-2026/)**
 
-![Candidato mais votado em cada cidade](docs/img/02_mapa_vencedor.png)
+![Painel com os principais números](docs/img/painel_resumo.png)
 
 ## Em cinco números
 

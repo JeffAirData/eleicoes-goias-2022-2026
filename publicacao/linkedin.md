@@ -1,4 +1,4 @@
-Carrossel do post: `docs/img/cartao_1.png` a `cartao_5.png` (1080x1080), nessa ordem, e `docs/img/02_mapa_vencedor.png` por último.
+Imagem única: `docs/img/painel_resumo.png` (1200x1500). Ou carrossel: `docs/img/cartao_1.png` a `cartao_5.png` (1080x1080), nessa ordem.
 
 ---
 

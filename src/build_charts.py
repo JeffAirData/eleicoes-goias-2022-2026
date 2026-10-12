@@ -88,7 +88,7 @@ def estado(ano: int, turno: int = 1) -> pd.Series:
     return sel.groupby("nr_candidato")["votos"].sum() / sel["votos"].sum() * 100
 
 
-def chart_resultado() -> None:
+def draw_resultado(ax, escala: float = 1.0) -> None:
     linhas = []
     for ano, nome_pl in ((2022, "Jair Bolsonaro (PL)"), (2026, "Flávio Bolsonaro (PL)")):
         s = estado(ano)
@@ -98,22 +98,38 @@ def chart_resultado() -> None:
         partes.append(("Outros", 100 - sum(p[1] for p in partes), OUTROS))
         linhas.append((ano, partes))
 
-    fig, ax = plt.subplots(figsize=(11, 4.2))
     for y, (ano, partes) in zip((1, 0), linhas):
         left = 0.0
         for nome, valor, cor in partes:
             ax.barh(y, valor, left=left, color=cor, height=0.5, edgecolor=SURFACE, linewidth=2)
             if valor >= 9:
                 ax.text(left + valor / 2, y, f"{fmt(valor)}%", ha="center", va="center",
-                        color="white" if cor != CAIADO else INK, fontsize=13, fontweight="bold")
-                ax.text(left + valor / 2, y + 0.36, nome, ha="center", va="bottom", color=INK_2, fontsize=10.5)
+                        color="white" if cor != CAIADO else INK, fontsize=13 * escala, fontweight="bold")
+                ax.text(left + valor / 2, y + 0.36, nome, ha="center", va="bottom", color=INK_2,
+                        fontsize=10.5 * escala)
             else:
-                ax.text(101, y, f"Outros\n{fmt(valor)}%", ha="left", va="center", color=INK_2, fontsize=10.5)
+                ax.text(101, y, f"Outros\n{fmt(valor)}%", ha="left", va="center", color=INK_2,
+                        fontsize=10.5 * escala)
             left += valor
-        ax.text(-1.5, y, str(ano), ha="right", va="center", fontsize=14, fontweight="bold")
+        ax.text(-1.5, y, str(ano), ha="right", va="center", fontsize=14 * escala, fontweight="bold")
     ax.set_xlim(0, 108)
     ax.set_ylim(-0.45, 1.75)
     ax.axis("off")
+
+
+def draw_mapas(axes, geo, fontsize: float = 15) -> None:
+    for ax, ano in zip(axes, (2022, 2026)):
+        col = f"vencedor_{ano}"
+        geo.plot(ax=ax, color=geo[col].map({"PL": PL, "PT": PT}), edgecolor=SURFACE, linewidth=0.35)
+        n = geo[col].value_counts()
+        ax.set_title(f"{ano}: PL {n.get('PL', 0)} × {n.get('PT', 0)} PT", fontsize=fontsize, fontweight="bold",
+                     color=INK)
+        ax.axis("off")
+
+
+def chart_resultado() -> None:
+    fig, ax = plt.subplots(figsize=(11, 4.2))
+    draw_resultado(ax)
     fig.suptitle("Presidente em Goiás: Lula perde 8,5 pontos; PL mantém a maioria", x=0.02, ha="left",
                  fontsize=16, fontweight="bold")
     fig.text(0.02, 0.02, FONTE, color=MUTED, fontsize=9)
@@ -123,12 +139,7 @@ def chart_resultado() -> None:
 
 def chart_mapas(geo) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(12, 6.3))
-    for ax, ano in zip(axes, (2022, 2026)):
-        col = f"vencedor_{ano}"
-        geo.plot(ax=ax, color=geo[col].map({"PL": PL, "PT": PT}), edgecolor=SURFACE, linewidth=0.35)
-        n = geo[col].value_counts()
-        ax.set_title(f"{ano}: PL {n.get('PL', 0)} × {n.get('PT', 0)} PT", fontsize=15, fontweight="bold", color=INK)
-        ax.axis("off")
+    draw_mapas(axes, geo)
     fig.legend(handles=[Patch(color=PL, label="PL à frente"), Patch(color=PT, label="PT à frente")],
                loc="lower center", ncol=2, frameon=False, fontsize=11, bbox_to_anchor=(0.5, 0.06))
     fig.suptitle("69 municípios goianos trocaram o PT pelo PL; nenhum fez o caminho inverso",
@@ -136,6 +147,45 @@ def chart_mapas(geo) -> None:
     fig.text(0.03, 0.02, FONTE + " Candidato mais votado por município.", color=MUTED, fontsize=9)
     fig.subplots_adjust(top=0.84, bottom=0.12, wspace=0.02)
     fig.savefig(IMG_DIR / "02_mapa_vencedor.png", dpi=100)
+    plt.close(fig)
+
+
+def chart_painel(mun: pd.DataFrame, geo) -> None:
+    """Painel único (1200x1500) com os principais números, para redes sociais."""
+    detalhe = pd.read_parquet(DATA_DIR / "presidente_go_comparecimento.parquet")
+    det = detalhe[(detalhe["ano"] == 2026) & (detalhe["turno"] == 1)]
+    abstencao = det["abstencoes"].sum() / det["aptos"].sum() * 100
+    pt_frente = {ano: int((mun[f"vencedor_{ano}"] == "PT").sum()) for ano in (2022, 2026)}
+    viraram = int(((mun["vencedor_2022"] == "PT") & (mun["vencedor_2026"] == "PL")).sum())
+    voltaram = int(((mun["vencedor_2022"] == "PL") & (mun["vencedor_2026"] == "PT")).sum())
+    blocos = [
+        (PT, f"{pt_frente[2022]} → {pt_frente[2026]}", "cidades com Lula\nna frente"),
+        (PL, f"{viraram} a {voltaram}", "cidades trocaram\no PT pelo PL"),
+        (CAIADO, f"1 em {round(100 / estado(2026)[55])}", "votos foi para\nRonaldo Caiado"),
+        (OUTROS, f"{round(abstencao)} em 100", "eleitores não\nforam votar"),
+    ]
+
+    fig = plt.figure(figsize=(12, 15))
+    fig.text(0.05, 0.955, "Como Goiás votou para presidente", fontsize=34, fontweight="bold")
+    fig.text(0.05, 0.925, "1º turno de 2022 e de 2026, nas 246 cidades do estado", fontsize=19, color=INK_2)
+
+    for k, (cor, numero, legenda) in enumerate(blocos):
+        x = 0.05 + k * 0.232
+        fig.add_artist(plt.Rectangle((x, 0.875), 0.05, 0.006, color=cor, transform=fig.transFigure))
+        fig.text(x, 0.835, numero, fontsize=35, fontweight="bold", va="center")
+        fig.text(x, 0.808, legenda, fontsize=15.5, color=INK_2, va="top", linespacing=1.3)
+
+    fig.text(0.05, 0.725, "De cada 100 votos no estado", fontsize=20, fontweight="bold")
+    draw_resultado(fig.add_axes([0.085, 0.555, 0.90, 0.16]), escala=1.3)
+
+    fig.text(0.05, 0.515, "Quem ficou na frente em cada cidade", fontsize=20, fontweight="bold")
+    draw_mapas([fig.add_axes([0.03, 0.10, 0.47, 0.38]), fig.add_axes([0.50, 0.10, 0.47, 0.38])], geo, fontsize=18)
+    fig.legend(handles=[Patch(color=PL, label="PL na frente"), Patch(color=PT, label="PT na frente")],
+               loc="lower center", ncol=2, frameon=False, fontsize=15, bbox_to_anchor=(0.5, 0.058))
+    fig.text(0.05, 0.025, "Fonte: TSE, Portal de Dados Abertos. Votos válidos para presidente em Goiás.",
+             fontsize=13, color=MUTED)
+    fig.text(0.95, 0.025, "github.com/JeffAirData", fontsize=13, color=MUTED, ha="right")
+    fig.savefig(IMG_DIR / "painel_resumo.png", dpi=100)
     plt.close(fig)
 
 
@@ -291,6 +341,7 @@ def main() -> None:
     chart_dispersao(mun)
     chart_idade()
     chart_cartoes(mun)
+    chart_painel(mun, geo)
     build_painel(mun, geo)
     print(f"Gráficos em {IMG_DIR} e painel em {DOCS_DIR / 'index.html'}")
 
